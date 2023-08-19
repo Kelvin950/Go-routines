@@ -2,13 +2,49 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 )
 
-func checkandSaveBody(){
+func checkandSaveBody(url string){
+ 
+
+ res ,err := http.Get(url) 
+  if err!=nil{
+
+	fmt.Printf("%s is down\n" , url)
+  }else {
+
+	defer res.Body.Close() 
+
+  
 	
+	 if res.StatusCode ==200 {
+		  
+	bodyBytes ,err := ioutil.ReadAll(res.Body) 
+	 
+
+    file := strings.Split(url , "//")[1] 
+     file+=  "txt" 
+   
+	  fmt.Printf("writing to file %s" ,file)
+	  err= ioutil.WriteFile(file ,bodyBytes , 0664) 
+
+   if err!=nil{
+
+	log.Fatal("failed")
+   }
+
+
+	 }
+	 
+  }
+	 
 }
 
 func f1(wg *sync.WaitGroup){
