@@ -5,13 +5,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"runtime"
+	
+
 	"strings"
 	"sync"
 	"time"
 )
 
-func checkandSaveBody(url string){
+func checkandSaveBody(url string , wg *sync.WaitGroup){
  
 
  res ,err := http.Get(url) 
@@ -30,7 +31,7 @@ func checkandSaveBody(url string){
 	 
 
     file := strings.Split(url , "//")[1] 
-     file+=  "txt" 
+     file+=  ".txt" 
    
 	  fmt.Printf("writing to file %s" ,file)
 	  err= ioutil.WriteFile(file ,bodyBytes , 0664) 
@@ -44,7 +45,8 @@ func checkandSaveBody(url string){
 	 }
 	 
   }
-	 
+
+  wg.Done()
 }
 
 func f1(wg *sync.WaitGroup){
@@ -72,30 +74,40 @@ func f2(){
 
 func main(){
 
-	var wg sync.WaitGroup
+	var wg *sync.WaitGroup
 
-	 wg.Add(1)
-	fmt.Println("main execution started")
-	fmt.Println("no of cpus:" , runtime.NumCPU()) 
-	fmt.Println("no of goroutines" , runtime.NumGoroutine())
+
+// 	fmt.Println("main execution started")
+// 	fmt.Println("no of cpus:" , runtime.NumCPU()) 
+// 	fmt.Println("no of goroutines" , runtime.NumGoroutine())
 	
 
-	fmt.Println("os" , runtime.GOOS)
-	fmt.Println("arch"  , runtime.GOARCH)
+// 	fmt.Println("os" , runtime.GOOS)
+// 	fmt.Println("arch"  , runtime.GOARCH)
 
-	fmt.Println("gomaxprocs" , runtime.GOMAXPROCS(0))
+// 	fmt.Println("gomaxprocs" , runtime.GOMAXPROCS(0))
 
-     go f1(&wg) 
+//      go f1(&wg) 
 
- fmt.Println("no of goroutines after go f1()",runtime.NumGoroutine())
-
-
-  f2()
+//  fmt.Println("no of goroutines after go f1()",runtime.NumGoroutine())
 
 
-  wg.Wait()
-
- fmt.Println("main execution ended")
+//   f2()
 
 
+//   wg.Wait()
+
+//  fmt.Println("main execution ended")
+
+ 
+var url = []string{"https://www.golang1.org", "https://www.google.com", "https://www.medium.com"}
+	 wg.Add(len(url))
+
+for _,a :=range url{
+
+	checkandSaveBody(a ,wg)
+}
+
+
+wg.Wait()
 }
