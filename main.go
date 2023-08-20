@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"runtime"
 	"strings"
 )
 
@@ -26,8 +27,10 @@ func checkandSaveBody(url string , ch chan string){
 	ch <-  s
   }else {
 
+	
 	defer res.Body.Close()
 
+	var s string
 	 if res.StatusCode ==200 {
 
 	bodyBytes ,err := ioutil.ReadAll(res.Body)
@@ -35,7 +38,7 @@ func checkandSaveBody(url string , ch chan string){
     file := strings.Split(url , "//")[1]
      file+=  ".txt"
 
-	 s := fmt.Sprintf("writing to file %s" ,file)
+	 s = fmt.Sprintf("writing to file %s" ,file)
 	  err= ioutil.WriteFile(file ,bodyBytes , 0664)
 
    if err!=nil{
@@ -45,6 +48,7 @@ func checkandSaveBody(url string , ch chan string){
 
 	 }
 
+	  ch <- s
   }
 
  
@@ -117,13 +121,23 @@ func main(){
 // 	 wg.Add(len(url))
 
 
-	 
+//  ch :=make(chan  string) //unbuffered channel 
+ 
+ 
+
 	  
 // for _,a :=range url{
 
-//   go checkandSaveBody(a ,&wg)
+//   go checkandSaveBody(a  , ch) 
+ 
 // }
 
+// fmt.Println("number of channels " ,runtime.NumGoroutine())
+
+// for  i:=0 ; i<len(url) ;i++{
+
+// 	fmt.Printf(" %s\n" , <-ch )
+}
 // fmt.Printf("number of goroutines %d", runtime.NumGoroutine() )
 // wg.Wait()
 
@@ -169,23 +183,22 @@ func main(){
 
 // fmt.Printf("%d\n" ,n)
 
-ch := make(chan int) 
+// ch := make(chan int) 
 
-defer close(ch) 
+// defer close(ch) 
 
-go factorial(5, ch) 
-
-
-nums := <-ch 
-
-fmt.Printf("%d\n" , nums)
-
-for  i:=1 ;  i<20 ; i++{
-
-	go factorial(i , ch) 
-	f := <-ch 
-	fmt.Printf("%d\n" , f)
-} 
+// go factorial(5, ch) 
 
 
-}
+// nums := <-ch 
+
+// fmt.Printf("%d\n" , nums)
+
+// for  i:=1 ;  i<20 ; i++{
+
+// 	go factorial(i , ch) 
+// 	f := <-ch 
+// 	fmt.Printf("%d\n" , f)
+// } 
+
+
