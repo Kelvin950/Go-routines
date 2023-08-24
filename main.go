@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net/http"
-	"runtime"
+
+	"time"
+
 	"strings"
 )
 
@@ -25,7 +28,8 @@ func checkandSaveBody(url string , ch chan string){
 	s := fmt.Sprintf("%s is down\n" , url)
 	s +=fmt.Sprintf("  value %v" , err)
 	ch <-  s
-  }else {
+  }else {time.Sleep(time.Second *2) 
+
 
 	
 	defer res.Body.Close()
@@ -45,6 +49,7 @@ func checkandSaveBody(url string , ch chan string){
 
 	s +=fmt.Sprintf(" failed %v" , err)
    }
+   
 
 	 }
 
@@ -90,6 +95,58 @@ func factorial(n int  , c chan int ){
 
 func main(){
 
+
+
+
+
+	ch := make( chan float64)
+
+ power :=  func(n float64 , ch chan float64) {
+ 
+  
+ ch <- math.Pow(n ,2)	 
+ }
+// var wg sync.WaitGroup 
+
+// wg.Add(3) 
+ 
+ var  i = 0.0
+for   i < 50.0  {
+ go power(i ,ch)
+
+
+ i++ 
+}
+
+for i:=0 ; i<50;i++{
+
+fmt.Println( <-ch)
+}
+
+// go func(wg *sync.WaitGroup){
+//  fmt.Println("hello world")
+
+//  wg.Done()
+// }(&wg)
+
+
+// wg.Wait()
+
+// sum := func( wg * sync.WaitGroup ,n ...float64 ){
+  
+
+//   fmt.Println(fmt.Sprintf("%.2f" , n[0]+n[1]))
+ 
+  
+//   wg.Done()
+// }
+
+
+// go sum(&wg , 1.0 , 2.0)
+// go sum(&wg , 1.0 , 2.0)
+// go sum(&wg , 1.0 , 2.0)
+
+// wg.Wait()
 	// var wg sync.WaitGroup
 
 
@@ -123,8 +180,51 @@ func main(){
 
 //  ch :=make(chan  string) //unbuffered channel 
  
+
+// c1 :=make(chan  int) 
+//  _=c1
+// c2 :=make(chan int, 3) //buffered channel
+
+
+// // go func(c chan int) {
+// //  fmt.Println("func go routine start sending data into the channel")
+// //  c <-10
+// //  fmt.Println("func go routine after sending data into the channel")
+// // }(c1)
  
 
+// // fmt.Println("main goroutine sleeps for 2 seconds")
+// // time.Sleep(time.Second *2) 
+
+
+// // fmt.Println("main go routine start receiving data")
+// // d := <-c1 
+
+// // fmt.Println(d) 
+ 
+// go func(c chan int) {
+
+// 	for  i :=1 ; i<=5 ;i++{
+ 
+// 		fmt.Printf("func goroutine %d  starts sending data\n" , i)
+// 		c <- i 
+// 		fmt.Printf("func goroutine %d after sending data\n" ,i)
+	
+// 	}
+// 	close(c)
+// }(c2)
+
+// fmt.Println("main sleeps for 2 secons")
+// time.Sleep(time.Second*2) 
+
+
+
+
+
+// for v := range c2 {
+
+// 	fmt.Println("main go received value" , v)
+// }
 	  
 // for _,a :=range url{
 
